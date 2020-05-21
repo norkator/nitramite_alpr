@@ -16,7 +16,7 @@ train_dir = base_path + 'train/'
 NUM_TRAIN_SAMPLES = len([name for name in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, name))])
 
 # Training variables
-BATCH_SIZE = 28  # original 32
+BATCH_SIZE = 28  # original 32, 32 crash/oom with RTX, 28 'magic number' works well
 BATCH_SIZE_VAL = 10  # original 10
 NUM_EPOCHS = 100
 INITIAL_EPOCH = 0
