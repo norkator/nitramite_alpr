@@ -25,7 +25,7 @@ NUM_VAL_SAMPLES = 150
 NUM_STEPS_VAL = int(NUM_VAL_SAMPLES / BATCH_SIZE_VAL)
 LR_INIT = 0.001
 lr_decay = 0.5
-decay_every = int(NUM_EPOCHS / 5)
+decay_every = int(NUM_EPOCHS / 4)
 
 
 def train():
@@ -57,12 +57,12 @@ def train():
             loss_val.append(loss_mse)
         val_loss_cur = np.mean(loss_val)
 
-        print('Epoch: %d, p_model loss: %f, val loss: %f' % (epoch, np.mean(loss), val_loss_cur))
+        print('[Info] Epoch: %d, p_model loss: %f, val loss: %f' % (epoch, np.mean(loss), val_loss_cur))
 
         if val_loss_cur <= val_loss:
             val_loss = val_loss_cur
             model.save_weights(model_output_path + 'lp_model.h5')
-            print('model saved!')
+            print('[info] model savepoint...')
         if (epoch != 0) and (epoch % decay_every == 0):
             new_lr_decay = lr_decay ** (epoch // decay_every)
             lr_v.assign(LR_INIT * new_lr_decay)
