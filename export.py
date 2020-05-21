@@ -7,15 +7,21 @@ import cv2
 # Paths
 output_root_folder_path = os.getcwd() + '/output/'
 output_lp_training_main_path = os.getcwd() + '/output/lp_training/'
-output_lp_training_train_path = output_lp_training_main_path + 'train/'
-output_lp_training_test_path = output_lp_training_main_path + 'test/'
 output_lp_training_lp_path = output_lp_training_main_path + 'lp/'
+
+output_lp_training_train_path = output_lp_training_main_path + 'train/'
+output_lp_training_train_labels_path = output_lp_training_train_path + 'labels/'
+
+output_lp_training_test_path = output_lp_training_main_path + 'test/'
+output_lp_training_test_labels_path = output_lp_training_test_path + 'labels/'
 
 # Check path existence
 Path(output_lp_training_main_path).mkdir(parents=True, exist_ok=True)
-Path(output_lp_training_train_path).mkdir(parents=True, exist_ok=True)
-Path(output_lp_training_test_path).mkdir(parents=True, exist_ok=True)
 Path(output_lp_training_lp_path).mkdir(parents=True, exist_ok=True)
+Path(output_lp_training_train_path).mkdir(parents=True, exist_ok=True)
+Path(output_lp_training_train_labels_path).mkdir(parents=True, exist_ok=True)
+Path(output_lp_training_test_path).mkdir(parents=True, exist_ok=True)
+Path(output_lp_training_test_labels_path).mkdir(parents=True, exist_ok=True)
 
 
 # Original images are resize'd,
@@ -29,6 +35,16 @@ def calculate_resize_bbox(orig_w, orig_h, new_w, new_h, orig_x, orig_y, orig_x2,
     r = [new_x, new_y, new_x2, new_y2]
     print(r)
     return r
+
+
+# Write training or testing images with labels
+def write_image_and_label_files(path, image_name, image_data, x, y, x2, y2):
+    try:
+        cv2.imwrite(path + image_name, image_data)
+        with open((path + 'labels/' + image_name + '.txt'), 'w') as text_file:
+            text_file.write(str(x) + ',' + str(y) + ',' + str(x2) + ',' + str(y2))
+    except Exception as e:
+        print(e)
 
 
 def app():
@@ -58,17 +74,9 @@ def app():
 
     # Export process
     if len(lp_training_image_objects) > 0:
+        index = 0
         for tio in lp_training_image_objects:
-            # Write lp crop image for viewing purposes
             img = cv2.imread(tio.file_full_path)
-
-            '''
-            lp_crop = img[tio.labeling_image_y:tio.labeling_image_y2, tio.labeling_image_x:tio.labeling_image_x2]
-            try:
-                cv2.imwrite(output_lp_training_lp_path + '/' + tio.file_name_cropped, lp_crop)
-            except Exception as e:
-                print(e)
-            '''
 
             original_h, original_w, original_c = img.shape
             new_size = 256  # will be square, same width, same height
@@ -78,7 +86,25 @@ def app():
                 tio.labeling_image_x, tio.labeling_image_y, tio.labeling_image_x2, tio.labeling_image_y2
             )
 
-            lp_crop = resize[new_bbox[1]:new_bbox[3], new_bbox[0]:new_bbox[2]]
+            if index % 5:
+                # Training
+                write_image_and_label_files(
+                    output_lp_training_train_path, tio.file_name_cropped, resize,
+                    new_bbox[0], new_bbox[1], new_bbox[2], new_bbox[3]
+                )
+            else:
+                # Testing
+                write_image_and_label_files(
+                    output_lp_training_test_path, tio.file_name_cropped, resize,
+                    new_bbox[0], new_bbox[1], new_bbox[2], new_bbox[3]
+                )
+
+            # Write cropped lp's just for possible inspection
+            lp_crop = img[tio.labeling_image_y:tio.labeling_image_y2, tio.labeling_image_x:tio.labeling_image_x2]
+            try:
+                cv2.imwrite(output_lp_training_lp_path + '/' + tio.file_name_cropped, lp_crop)
+            except Exception as e:
+                print(e)
 
             '''
             cv2.imshow("OrigImg", img)
@@ -86,6 +112,8 @@ def app():
             cv2.imshow("LpCrop", lp_crop)
             cv2.waitKey(0)
             '''
+
+            index = index + 1
 
         print('[info] export completed')
     else:
