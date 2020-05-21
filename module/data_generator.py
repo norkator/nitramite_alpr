@@ -1,3 +1,4 @@
+from __future__ import division
 import threading
 from PIL import Image
 import numpy as np

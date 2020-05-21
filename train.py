@@ -16,16 +16,16 @@ train_dir = base_path + 'train/'
 NUM_TRAIN_SAMPLES = len([name for name in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, name))])
 
 # Training variables
-BATCH_SIZE = 8  # original 32
-BATCH_SIZE_VAL = 5  # original 10
-NUM_EPOCHS = 200
+BATCH_SIZE = 28  # original 32
+BATCH_SIZE_VAL = 10  # original 10
+NUM_EPOCHS = 100
 INITIAL_EPOCH = 0
 NUM_STEPS = int(NUM_TRAIN_SAMPLES / BATCH_SIZE)
 NUM_VAL_SAMPLES = 150
 NUM_STEPS_VAL = int(NUM_VAL_SAMPLES / BATCH_SIZE_VAL)
 LR_INIT = 0.001
 lr_decay = 0.5
-decay_every = int(NUM_EPOCHS / 4)
+decay_every = int(NUM_EPOCHS / 5)
 
 
 def train():
@@ -57,7 +57,8 @@ def train():
             loss_val.append(loss_mse)
         val_loss_cur = np.mean(loss_val)
 
-        print('[Info] Epoch: %d, p_model loss: %f, val loss: %f' % (epoch, np.mean(loss), val_loss_cur))
+        # Lower test validation loss is what matters
+        print('[Info] Epoch: %d, training loss: %f, test validation loss: %f' % (epoch, np.mean(loss), val_loss_cur))
 
         if val_loss_cur <= val_loss:
             val_loss = val_loss_cur
