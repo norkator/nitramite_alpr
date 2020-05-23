@@ -10,7 +10,7 @@ models_path = os.getcwd() + '/models/'
 
 
 def bool_accepted_label(label):
-    if label is 'car' or label is 'truck' or label is 'bus':
+    if label == 'car' or label == 'truck' or label == 'bus':
         return True
     else:
         return False
@@ -42,7 +42,6 @@ def analyze_image(output_path, image_object):
         img_full_size = img.copy()
 
         img = cv2.resize(img, None, fx=0.4, fy=0.4)
-        img_box = img.copy()
         height, width, channels = img.shape
 
         # Detecting objects
@@ -87,9 +86,6 @@ def analyze_image(output_path, image_object):
         # another function to remove this “noise”. It’s called Non maximum suppression.
         indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
 
-        # Output file name
-        out_file_name = image_object.year + '_' + image_object.month + '_' + image_object.day + '_' + image_object.hours + '_' + image_object.minutes + '_' + image_object.seconds
-
         # We finally extract all the information's and show them on the screen.
         font = cv2.FONT_HERSHEY_PLAIN
         for i in range(len(boxes)):
@@ -98,7 +94,6 @@ def analyze_image(output_path, image_object):
                 x, y, w, h = filter_negative_values(boxes[i])
                 x_, y_, w_, h_ = filter_negative_values(original_img_boxes[i])
 
-                # roi = img_box[y:y + h, x:x + w]
                 roi_full_image = img_full_size[y_:y_ + h_, x_:x_ + w_]
                 label = str(classes[class_ids[i]])
                 color = colors[i]
@@ -106,37 +101,50 @@ def analyze_image(output_path, image_object):
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 1)
                 cv2.putText(img, label, (x, y + 20), font, 2, color, 2)
 
+                print('[Info] got label: ' + label)
                 if bool_accepted_label(label) is True:
-
-                    # Small image naming and output path
-                    crop_image_name_extension = out_file_name + '_' + str(i) + image_object.file_extension
-                    crop_image_file_path_name_extension = output_path + '/' + crop_image_name_extension
-
-                    # Write small image
                     try:
-                        Path(output_path + '/').mkdir(parents=True, exist_ok=True)
-                        cv2.imwrite(
-                            crop_image_file_path_name_extension,
-                            roi_full_image
-                        )
-                    except Exception as e:
-                        print(e)
+                        # We don't know id yet at this point
+                        name_part = '_' + image_object.file_extension
 
-                    # Insert database intelligence
-                    try:
-                        database.insert_offsite_value(
+                        # Inserted id will be used as naming image
+                        inserted_id = database.insert_offsite_value(
                             image_object.name,
-                            label, image_object.file_name,
-                            image_object.year, image_object.month, image_object.day,
-                            image_object.hours, image_object.minutes, image_object.seconds,
-                            crop_image_name_extension
+                            label,
+                            image_object.file_name,
+                            image_object.year,
+                            image_object.month,
+                            image_object.day,
+                            image_object.hours,
+                            image_object.minutes,
+                            image_object.seconds,
+                            name_part
                         )
+                        print('New id: ' + str(inserted_id))
+
+                        if inserted_id is not None:
+                            # Cropped image naming and output path
+                            crop_image_name_extension = str(inserted_id) + name_part
+                            crop_image_file_path_name_extension = output_path + '/' + crop_image_name_extension
+
+                            print('Name should be: ' + crop_image_name_extension)
+
+                            # Write crop image
+                            Path(output_path + '/').mkdir(parents=True, exist_ok=True)
+                            cv2.imwrite(
+                                crop_image_file_path_name_extension,
+                                roi_full_image
+                            )
                     except Exception as e:
                         print(e)
 
         # Move processed image
         shutil.move(image_object.file_path + image_object.file_name,
                     image_object.file_path + 'processed/' + image_object.file_name)
+
+        # Show preview
+        cv2.imshow("ImporterImg", img)
+        cv2.waitKey(1)  # no freeze, refreshes for a millisecond
 
     except AssertionError as e:
         print(e)
