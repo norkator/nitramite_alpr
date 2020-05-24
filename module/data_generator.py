@@ -27,10 +27,14 @@ def thread_safe_generator(f):
     return g
 
 
+def is_allowed_file_type(f):
+    return False if f == 'Thumbs.db' else True
+
+
 @thread_safe_generator
 def data_generator(base_path, batch_size):
     # Provide the same seed
-    input_files = [f for f in listdir(base_path) if isfile(join(base_path, f))]
+    input_files = [f for f in listdir(base_path) if (isfile(join(base_path, f)) and is_allowed_file_type(f))]
     input_files = sorted(input_files)
     gt_path = base_path + 'labels/'
 
