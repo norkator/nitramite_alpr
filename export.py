@@ -76,43 +76,45 @@ def app():
     if len(lp_training_image_objects) > 0:
         index = 0
         for tio in lp_training_image_objects:
-            img = cv2.imread(tio.file_full_path)
-
-            original_h, original_w, original_c = img.shape
-            new_size = 256  # will be square, same width, same height
-            resize = cv2.resize(img, (new_size, new_size))
-            new_bbox = calculate_resize_bbox(
-                original_w, original_h, new_size, new_size,
-                tio.labeling_image_x, tio.labeling_image_y, tio.labeling_image_x2, tio.labeling_image_y2
-            )
-
-            if index % 5:
-                # Training
-                write_image_and_label_files(
-                    output_lp_training_train_path, tio.file_name_cropped, resize,
-                    new_bbox[0], new_bbox[1], new_bbox[2], new_bbox[3]
-                )
-            else:
-                # Testing
-                write_image_and_label_files(
-                    output_lp_training_test_path, tio.file_name_cropped, resize,
-                    new_bbox[0], new_bbox[1], new_bbox[2], new_bbox[3]
-                )
-
-            # Write cropped lp's just for possible inspection
-            lp_crop = img[tio.labeling_image_y:tio.labeling_image_y2, tio.labeling_image_x:tio.labeling_image_x2]
             try:
-                cv2.imwrite(output_lp_training_lp_path + '/' + tio.file_name_cropped, lp_crop)
-            except Exception as e:
+                img = cv2.imread(tio.file_full_path)
+
+                original_h, original_w, original_c = img.shape
+                new_size = 256  # will be square, same width, same height
+                resize = cv2.resize(img, (new_size, new_size))
+                new_bbox = calculate_resize_bbox(
+                    original_w, original_h, new_size, new_size,
+                    tio.labeling_image_x, tio.labeling_image_y, tio.labeling_image_x2, tio.labeling_image_y2
+                )
+
+                if index % 5:
+                    # Training
+                    write_image_and_label_files(
+                        output_lp_training_train_path, tio.file_name_cropped, resize,
+                        new_bbox[0], new_bbox[1], new_bbox[2], new_bbox[3]
+                    )
+                else:
+                    # Testing
+                    write_image_and_label_files(
+                        output_lp_training_test_path, tio.file_name_cropped, resize,
+                        new_bbox[0], new_bbox[1], new_bbox[2], new_bbox[3]
+                    )
+
+                # Write cropped lp's just for possible inspection
+                lp_crop = img[tio.labeling_image_y:tio.labeling_image_y2, tio.labeling_image_x:tio.labeling_image_x2]
+                try:
+                    cv2.imwrite(output_lp_training_lp_path + '/' + tio.file_name_cropped, lp_crop)
+                except Exception as e:
+                    print(e)
+
+                '''
+                cv2.imshow("OrigImg", img)
+                cv2.imshow("256Img", resize)
+                cv2.imshow("LpCrop", lp_crop)
+                cv2.waitKey(0)
+                '''
+            except AttributeError as e:
                 print(e)
-
-            '''
-            cv2.imshow("OrigImg", img)
-            cv2.imshow("256Img", resize)
-            cv2.imshow("LpCrop", lp_crop)
-            cv2.waitKey(0)
-            '''
-
             index = index + 1
 
         print('[info] export completed')
