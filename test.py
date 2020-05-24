@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from os import listdir
 from PIL import Image
 import numpy as np
+import cv2
 import os
 
 # Paths
@@ -22,6 +23,7 @@ def test(max_test_images):
 
     for i in range(max_test_images):
         img_name = files[i]  # test folder image index
+        img = cv2.imread(base_test_path + img_name)
         inputs = Image.open(join(base_test_path, img_name))
         inputs = np.array(inputs, dtype=np.float32)
         inputs = inputs / 255.0
@@ -36,6 +38,11 @@ def test(max_test_images):
         h = int((outputs[3] - outputs[1]) * 256)
 
         print(str([x, y, w, h]))
-        plt.imshow(inputs)
-        plt.imshow(inputs[y:y + h, x:x + w, :])
-        plt.show()
+        # plt.imshow(inputs)
+        # plt.imshow(inputs[y:y + h, x:x + w, :])
+        # plt.show()
+
+        cv2.rectangle(img, (x, y), (x + w, y + h), 255, 1)
+        cv2.imshow("lpTraining", img)
+        cv2.waitKey(0)
+
