@@ -62,7 +62,11 @@ def app():
         labeling_image_y2 = row[6]
 
         # Construct paths
-        input_image = output_root_folder_path + label + '/' + file_name_cropped
+        input_image = None
+        if label is not None:
+            input_image = output_root_folder_path + label + '/' + file_name_cropped
+        else:
+            input_image = output_root_folder_path + 'lp_training/offsite_images/' + file_name_cropped
 
         # Make objects
         lp_training_image_object = TrainingFile.TrainingFile(
