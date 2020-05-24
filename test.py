@@ -21,6 +21,9 @@ def test(max_test_images):
     files = [f for f in listdir(base_test_path) if isfile(join(base_test_path, f))]
     files = sorted(files)
 
+    if max_test_images is None:
+        max_test_images = len(files)
+
     for i in range(max_test_images):
         img_name = files[i]  # test folder image index
         img = cv2.imread(base_test_path + img_name)
