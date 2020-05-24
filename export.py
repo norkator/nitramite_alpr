@@ -61,16 +61,19 @@ def app():
         labeling_image_x2 = row[5]
         labeling_image_y2 = row[6]
 
-        # Construct paths
+        # There's small differences in naming between OI and off site images
         input_image = None
+        cropped_name = None
         if label is not None:
+            cropped_name = file_name_cropped
             input_image = output_root_folder_path + label + '/' + file_name_cropped
         else:
-            input_image = output_root_folder_path + 'lp_training/offsite_images/' + file_name_cropped
+            cropped_name = str(id) + file_name_cropped
+            input_image = output_root_folder_path + 'lp_training/offsite_images/' + str(id) + file_name_cropped
 
         # Make objects
         lp_training_image_object = TrainingFile.TrainingFile(
-            id, file_name_cropped, label,
+            id, cropped_name, label,
             labeling_image_x, labeling_image_y, labeling_image_x2, labeling_image_y2,
             input_image
         )
