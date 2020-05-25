@@ -16,13 +16,18 @@ train_dir = base_path + 'train/'
 NUM_TRAIN_SAMPLES = len([name for name in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, name))])
 print('[Info] train samples: ' + str(NUM_TRAIN_SAMPLES))
 
+# Test images count
+test_dir = base_path + 'test/'
+NUM_VAL_SAMPLES = len([name for name in os.listdir(test_dir) if os.path.isfile(os.path.join(test_dir, name))])
+print('[Info] test samples: ' + str(NUM_VAL_SAMPLES))
+
 # Training variables
 BATCH_SIZE = 28  # original 32, 32 crash/oom with RTX, 28 'magic number' works well
 BATCH_SIZE_VAL = 10  # original 10
-NUM_EPOCHS = 100
+NUM_EPOCHS = 400
 INITIAL_EPOCH = 0
 NUM_STEPS = int(NUM_TRAIN_SAMPLES / BATCH_SIZE)
-NUM_VAL_SAMPLES = 150
+# NUM_VAL_SAMPLES = 250
 NUM_STEPS_VAL = int(NUM_VAL_SAMPLES / BATCH_SIZE_VAL)
 LR_INIT = 0.001
 lr_decay = 0.5
