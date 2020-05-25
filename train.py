@@ -11,6 +11,13 @@ model_output_path = base_path + 'model/'
 # Check path existence
 Path(model_output_path).mkdir(parents=True, exist_ok=True)
 
+# Set TensorFlow session config
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.8  # 1.0 => 100%
+# config.gpu_options.allow_growth = True
+tf_session = tf.compat.v1.Session(config=config)
+tf.compat.v1.keras.backend.set_session(tf_session)
+
 # Get train images count
 train_dir = base_path + 'train/'
 NUM_TRAIN_SAMPLES = len([name for name in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, name))])
