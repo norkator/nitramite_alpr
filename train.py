@@ -38,7 +38,7 @@ NUM_STEPS = int(NUM_TRAIN_SAMPLES / BATCH_SIZE)
 NUM_STEPS_VAL = int(NUM_VAL_SAMPLES / BATCH_SIZE_VAL)
 LR_INIT = 0.001
 lr_decay = 0.5
-decay_every = int(NUM_EPOCHS / 5)  # Original / 5
+decay_every = int(NUM_EPOCHS / 8)  # Original / 5
 
 
 def train():

@@ -45,7 +45,8 @@ def test(max_test_images):
         # plt.imshow(inputs[y:y + h, x:x + w, :])
         # plt.show()
 
-        cv2.rectangle(img, (x, y), (x + w, y + h), 255, 1)
+        color = (0, 255, 0)
+        cv2.rectangle(img, (x, y), (x + w, y + h), color, 1)
         cv2.imshow("lpTraining", img)
         cv2.waitKey(0)
 
