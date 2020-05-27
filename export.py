@@ -94,7 +94,7 @@ def app():
                     tio.labeling_image_x, tio.labeling_image_y, tio.labeling_image_x2, tio.labeling_image_y2
                 )
 
-                if index % 10:
+                if index % 16:
                     # Training
                     write_image_and_label_files(
                         output_lp_training_train_path, tio.file_name_cropped, resize,

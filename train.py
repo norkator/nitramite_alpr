@@ -29,7 +29,7 @@ NUM_VAL_SAMPLES = len([name for name in os.listdir(test_dir) if os.path.isfile(o
 print('[Info] test samples: ' + str(NUM_VAL_SAMPLES))
 
 # Training variables
-BATCH_SIZE = 28  # original 32, 32 crash/oom with RTX, 28 'magic number' works well
+BATCH_SIZE = 26  # original 32, 32 crash/oom with RTX, 28 'magic number' works well
 BATCH_SIZE_VAL = 10  # original 10
 NUM_EPOCHS = 400
 INITIAL_EPOCH = 0
@@ -38,7 +38,7 @@ NUM_STEPS = int(NUM_TRAIN_SAMPLES / BATCH_SIZE)
 NUM_STEPS_VAL = int(NUM_VAL_SAMPLES / BATCH_SIZE_VAL)
 LR_INIT = 0.001
 lr_decay = 0.5
-decay_every = int(NUM_EPOCHS / 8)  # Original / 5
+decay_every = int(NUM_EPOCHS / 12)  # Original / 5
 
 
 def train():
