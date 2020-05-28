@@ -99,7 +99,8 @@ def app():
 
     # Export process
     if len(lp_training_image_objects) > 0:
-        modulo = (len(lp_training_image_objects) / 150)
+        modulo = int((len(lp_training_image_objects) / 150))
+        print('[Info] modulo: ' + str(modulo))
         index = 0
         for tio in lp_training_image_objects:
             try:
