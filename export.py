@@ -1,8 +1,9 @@
-import os
-from pathlib import Path
-from module import database
 from objects import TrainingFile
+from module import database
+from pathlib import Path
+import glob
 import cv2
+import os
 
 # Paths
 output_root_folder_path = os.getcwd() + '/output/'
@@ -22,6 +23,16 @@ Path(output_lp_training_train_path).mkdir(parents=True, exist_ok=True)
 Path(output_lp_training_train_labels_path).mkdir(parents=True, exist_ok=True)
 Path(output_lp_training_test_path).mkdir(parents=True, exist_ok=True)
 Path(output_lp_training_test_labels_path).mkdir(parents=True, exist_ok=True)
+
+
+def delete_old_files(path):
+    files = glob.glob(path + '*')
+    print('[Info] found ' + str(len(files)) + ' files. Deleting...')
+    for f in files:
+        try:
+            os.remove(f)
+        except PermissionError as e:
+            pass
 
 
 # Original images are resize'd,
@@ -48,6 +59,13 @@ def write_image_and_label_files(path, image_name, image_data, x, y, x2, y2):
 
 
 def app():
+    print('[Info] deleting old files')
+    delete_old_files(output_lp_training_lp_path)
+    delete_old_files(output_lp_training_train_path)
+    delete_old_files(output_lp_training_train_labels_path)
+    delete_old_files(output_lp_training_test_path)
+    delete_old_files(output_lp_training_test_labels_path)
+
     rows = database.get_labeled_for_training_lp_images()
     lp_training_image_objects = []
     for row in rows:
@@ -81,6 +99,7 @@ def app():
 
     # Export process
     if len(lp_training_image_objects) > 0:
+        modulo = (len(lp_training_image_objects) / 150)
         index = 0
         for tio in lp_training_image_objects:
             try:
@@ -94,7 +113,7 @@ def app():
                     tio.labeling_image_x, tio.labeling_image_y, tio.labeling_image_x2, tio.labeling_image_y2
                 )
 
-                if index % 16:
+                if index % modulo:
                     # Training
                     write_image_and_label_files(
                         output_lp_training_train_path, tio.file_name_cropped, resize,
