@@ -2,6 +2,7 @@ from __future__ import division
 from libraries.nitramite_alpr.module import detect_model
 from os.path import isfile, join
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from os import listdir
 from PIL import Image
 import numpy as np
@@ -12,6 +13,13 @@ import os
 base_path = os.getcwd() + '/output/lp_training/'
 model_output_path = base_path + 'model/'
 base_test_path = base_path + 'test/'
+
+# Set TensorFlow session config
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.8  # 1.0 => 100%
+# config.gpu_options.allow_growth = True
+tf_session = tf.compat.v1.Session(config=config)
+tf.compat.v1.keras.backend.set_session(tf_session)
 
 
 def test(max_test_images):
@@ -49,4 +57,3 @@ def test(max_test_images):
         cv2.rectangle(img, (x, y), (x + w, y + h), color, 1)
         cv2.imshow("lpTraining", img)
         cv2.waitKey(0)
-
